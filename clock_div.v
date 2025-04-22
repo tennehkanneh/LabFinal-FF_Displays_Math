@@ -13,25 +13,15 @@ module clock_div
     
     wire [DIVIDE_BY - 1: 0] q_chain;
 
-    genvar i;
+    reg [DIVIDE_BY-1:0] count;
 
-    generate
-        for (i = 0; i < DIVIDE_BY; i = i + 1) begin
-            dff ff_i (
-                .reset(reset),
-                .clock(clock),
-                .D((i == 0) ? 1'b1 : q_chain[i - 1]),
-                .Q(q_chain[i]),
-                .NotQ() 
-            );
-        end
-    endgenerate
-
-    always @(posedge reset, posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         if (reset) begin
+            count <= 0;
             div_clock <= 0;
-        end else if (clock) begin
-            div_clock <= q_chain[DIVIDE_BY - 1];
+        end else begin
+            count <= count + 1;
+            div_clock <= count[DIVIDE_BY-1]; // MSB as output clock
         end
     end
     
