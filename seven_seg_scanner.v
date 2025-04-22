@@ -14,7 +14,8 @@ module seven_seg_scanner(
 
     // Use the D FlipFlops from previous labs, and implement all other logic
     // purely combinatorial.
-
+    assign next_state = current_state + 1;
+    
     dff state_ff0 (
         .reset(reset),
         .clock(div_clock),
@@ -29,16 +30,11 @@ module seven_seg_scanner(
         .Q(current_state[1])
     );
 
-    assign next_state = reset ? 2'b00 : current_state + 1'b1;
-
-    // Anodes are:
-    // 0: R Right
-    assign anode[0] = (current_state == 2'b00) ? 1'b0 : 1'b1;
-    // 1: RC Right Center
-    assign anode[1] = (current_state == 2'b01) ? 1'b0 : 1'b1;
-    // 2: LC Left Center
-    assign anode[2] = (current_state == 2'b10) ? 1'b0 : 1'b1;
-    // 3: L Left
-    assign anode[3] = (current_state == 2'b11) ? 1'b0 : 1'b1;
-
+    assign anode =
+        (current_state == 2'b00) ? 4'b1110 :  // R
+        (current_state == 2'b01) ? 4'b1101 :  // RC
+        (current_state == 2'b10) ? 4'b1011 :  // LC
+        (current_state == 2'b11) ? 4'b0111 :  // L
+        4'b1111;                      // default (all off)
+    
 endmodule
